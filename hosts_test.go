@@ -54,5 +54,12 @@ func TestHosts(t *testing.T) {
 			So(err, ShouldBeNil)
 			So(created, ShouldBeFalse)
 		})
+
+		Convey("RemoveHost should remove the host", func() {
+			err := client.RemoveHost(hostname)
+			client.ActivateChanges()
+
+			So(err, ShouldBeNil)
+		})
 	})
 }

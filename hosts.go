@@ -91,6 +91,35 @@ func (client Client) GetDowntimesForHost(host string) (Downtimes, error) {
 	return downtimes, err
 }
 
+type removeHostRequest struct {
+	Hostname string `json:"hostname"`
+}
+
+// RemoveHost removes a host from check mk
+func (client Client) RemoveHost(hostname string) error {
+	reqBody := removeHostRequest{
+		Hostname: hostname,
+	}
+	reqBytes, err := json.Marshal(reqBody)
+	if err != nil {
+		return err
+	}
+
+	url := fmt.Sprintf("%s/webapi.py?action=delete_host&request=%s&%s", client.URL, string(reqBytes), client.requestCredentials)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return err
+	}
+
+	resp, err := client.httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+	return nil
+}
+
 // ScheduleHostDowntime places a given host in downtime for a given amount of minutes
 func (client Client) ScheduleHostDowntime(host string, minutes int, comment string) error {
 	date := jodaTime.Format("YYYY-MM-dd", time.Now())
