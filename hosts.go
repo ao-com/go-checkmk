@@ -21,8 +21,13 @@ type addHostRequest struct {
 	Attributes addHostRequestAttributes `json:"attributes"`
 }
 
-// AddHost adds a host to check mk
-func (client Client) AddHost(hostname string, folder string) error {
+type addHostResponse struct {
+	Result string `json:"result"`
+	Code   int32  `json:"result_code"`
+}
+
+// AddHost adds a host to check mk returns
+func (client Client) AddHost(hostname string, folder string) (bool, error) {
 	reqBody := addHostRequest{
 		Hostname: hostname,
 		Folder:   folder,
@@ -33,31 +38,42 @@ func (client Client) AddHost(hostname string, folder string) error {
 	}
 	reqBytes, err := json.Marshal(reqBody)
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	url := fmt.Sprintf("%s/webapi.py?action=add_host&request=%s&%s", client.URL, string(reqBytes), client.requestCredentials)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	resp, err := client.httpClient.Do(req)
-	respBytes, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(respBytes))
 	if err != nil {
-		return err
+		return false, err
+	}
+
+	var respBody *addHostResponse
+	bytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return false, err
+	}
+
+	err = json.Unmarshal(bytes, &respBody)
+	if err != nil {
+		return false, err
+	}
+
+	if respBody.Code == 1 {
+		return false, nil
 	}
 
 	defer resp.Body.Close()
-
-	return nil
+	return true, nil
 }
 
 // GetDowntimesForHost returns downtime entries for a given host
 func (client Client) GetDowntimesForHost(host string) (Downtimes, error) {
 	url := fmt.Sprintf("%s/view.py?host=%s&view_name=downtimes_of_host&%s", client.URL, host, client.requestCredentials)
-	fmt.Println(url)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return Downtimes{}, err

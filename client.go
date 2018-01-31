@@ -30,7 +30,6 @@ func NewClient(url string, username string, password string) Client {
 // ActivateChanges activates any pending changes in check_mk
 func (client Client) ActivateChanges() error {
 	url := fmt.Sprintf("%s/webapi.py?action=activate_changes&mode=dirty&allow_foreign_changes=1&%s", client.URL, client.requestCredentials)
-	fmt.Println(url)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return err

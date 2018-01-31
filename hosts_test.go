@@ -23,17 +23,19 @@ func TestHosts(t *testing.T) {
 				},
 			},
 		}
+		hostname := "go-check-mk-test-host"
+		folder := "go-check-mk-test-folder"
 
 		Convey("AddHost should create a new host", func() {
-			hostname := "go-check-mk-test-host"
-			err := client.AddHost(hostname, "go-check-mk-test-folder")
+			created, err := client.AddHost(hostname, folder)
 			expectedDescription := fmt.Sprintf("Created new host %s.", hostname)
-			auditLog, err := client.AuditLog()
+			auditLog, _ := client.AuditLog()
 			auditLogEntries := auditLog.FindEntriesByDescription(expectedDescription)
 			client.ActivateChanges()
 
 			So(err, ShouldBeNil)
 			So(len(auditLogEntries), ShouldBeGreaterThan, 0)
+			So(created, ShouldBeTrue)
 
 			Convey("Given a host", func() {
 				Convey("ScheduleDowntime should set the host with downtimes", func() {
@@ -44,6 +46,13 @@ func TestHosts(t *testing.T) {
 					So(len(downtimes), ShouldBeGreaterThan, 0)
 				})
 			})
+		})
+
+		Convey("AddHost should return false as the host already exists", func() {
+			created, err := client.AddHost(hostname, folder)
+
+			So(err, ShouldBeNil)
+			So(created, ShouldBeFalse)
 		})
 	})
 }
