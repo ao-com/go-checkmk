@@ -47,7 +47,7 @@ func (client Client) AddHost(hostname string, folder string) (bool, error) {
 		return false, err
 	}
 
-	resp, err := client.httpClient.Do(req)
+	resp, err := client.HTTPClient.Do(req)
 	if err != nil {
 		return false, err
 	}
@@ -79,7 +79,7 @@ func (client Client) GetDowntimesForHost(host string) (Downtimes, error) {
 		return Downtimes{}, err
 	}
 
-	resp, err := client.httpClient.Do(req)
+	resp, err := client.HTTPClient.Do(req)
 	if err != nil {
 		return Downtimes{}, err
 	}
@@ -111,7 +111,7 @@ func (client Client) RemoveHost(hostname string) error {
 		return err
 	}
 
-	resp, err := client.httpClient.Do(req)
+	resp, err := client.HTTPClient.Do(req)
 	if err != nil {
 		return err
 	}
@@ -134,10 +134,11 @@ func (client Client) ScheduleHostDowntime(host string, minutes int, comment stri
 		return err
 	}
 
-	_, err = client.httpClient.Do(req)
+	resp, err := client.HTTPClient.Do(req)
 	if err != nil {
 		return err
 	}
 
+	defer resp.Body.Close()
 	return nil
 }

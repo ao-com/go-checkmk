@@ -16,7 +16,7 @@ func TestHosts(t *testing.T) {
 		username := "go-checkmk"
 		password := "somepassword"
 		client := NewClient(url, username, password)
-		client.httpClient = &http.Client{
+		client.HTTPClient = &http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{
 					InsecureSkipVerify: true,

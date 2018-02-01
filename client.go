@@ -12,8 +12,8 @@ type Client struct {
 	URL                string
 	Username           string
 	Password           string
+	HTTPClient         *http.Client
 	requestCredentials string
-	httpClient         *http.Client
 }
 
 // NewClient will create a new check mk client
@@ -23,7 +23,7 @@ func NewClient(url string, username string, password string) Client {
 		Username:           username,
 		Password:           password,
 		requestCredentials: fmt.Sprintf("_username=%s&_secret=%s", username, password),
-		httpClient:         &http.Client{},
+		HTTPClient:         &http.Client{},
 	}
 }
 
@@ -35,7 +35,7 @@ func (client Client) ActivateChanges() error {
 		return err
 	}
 
-	resp, err := client.httpClient.Do(req)
+	resp, err := client.HTTPClient.Do(req)
 	if err != nil {
 		return err
 	}
@@ -52,7 +52,7 @@ func (client Client) AuditLog() (AuditLog, error) {
 		return AuditLog{}, err
 	}
 
-	resp, err := client.httpClient.Do(req)
+	resp, err := client.HTTPClient.Do(req)
 	if err != nil {
 		return AuditLog{}, err
 	}
@@ -71,7 +71,7 @@ func (client Client) IsAuthenticated() (bool, error) {
 		return false, err
 	}
 
-	resp, err := client.httpClient.Do(req)
+	resp, err := client.HTTPClient.Do(req)
 	if err != nil {
 		return false, err
 	}

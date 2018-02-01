@@ -16,7 +16,7 @@ func TestClient(t *testing.T) {
 		username := "go-checkmk"
 		password := "somepassword"
 		client := NewClient(url, username, password)
-		client.httpClient = &http.Client{
+		client.HTTPClient = &http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{
 					InsecureSkipVerify: true,
@@ -40,8 +40,8 @@ func TestClient(t *testing.T) {
 			So(client.requestCredentials, ShouldEqual, fmt.Sprintf("_username=%s&_secret=%s", username, password))
 		})
 
-		Convey("httpClient should be set", func() {
-			So(client.httpClient, ShouldNotBeNil)
+		Convey("HTTPClient should be set", func() {
+			So(client.HTTPClient, ShouldNotBeNil)
 		})
 
 		Convey("IsAuthenticated should return true", func() {
@@ -69,7 +69,7 @@ func TestClient(t *testing.T) {
 		username := "thiswontwork"
 		password := "password"
 		client := NewClient(url, username, password)
-		client.httpClient = &http.Client{
+		client.HTTPClient = &http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{
 					InsecureSkipVerify: true,
