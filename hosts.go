@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/vjeantet/jodaTime"
@@ -128,7 +129,7 @@ func (client Client) ScheduleHostDowntime(host string, minutes int, comment stri
 	viewName := "view_name=allhosts"
 	url := fmt.Sprintf("%s/view.py?_do_confirm=yes&_transid=-1&_do_actions=yes&host_regex=%s&%s&%s&%s&%s&_down_comment=%s&%s",
 		client.URL, host, viewName, timeParameters, "&_down_from_now=From+now+for&_down_duration=02%3A00", minutesParameter,
-		comment, client.requestCredentials)
+		url.QueryEscape(comment), client.requestCredentials)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return err
